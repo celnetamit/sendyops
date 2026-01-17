@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-inter: 'Inter', sans-serif;
+    --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
+  }
+  
+  body {
+    @apply antialiased;
+  }
+}

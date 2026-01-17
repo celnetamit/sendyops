@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id              String    @id @default(uuid())
+  name            String?
+  email           String    @unique
+  password        String    // Hashed password
+  role            String    @default("admin")
+  createdAt       DateTime  @default(now())
+}
+
+model Campaign {
+  id              String    @id
+  title           String
+  subject         String
+  fromName        String?
+  fromEmail       String?
+  status          String    @default("draft") // draft, scheduled, sending, sent
+  recipients      Int       @default(0)
+  sentAt          DateTime?
+  createdAt       DateTime  @default(now())
+  
+  // Analytics
+  opened          Int       @default(0)
+  clicked         Int       @default(0)
+  bounced         Int       @default(0)
+  unsubscribed    Int       @default(0)
+  
+  // For Sync
+  lastSyncedAt    DateTime  @default(now())
+}
+
+model Subscriber {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  name            String?
+  listId          String
+  status          String    @default("active") // active, unsubscribed, bounced
+  timestamp       DateTime  @default(now())
+  
+  lastSyncedAt    DateTime  @default(now())
+
+  @@index([email])
+  @@index([listId])
+}
+
+model EventLog {
+  id              String    @id @default(uuid())
+  type            String    // mail_sent, login, error
+  message         String
+  timestamp       DateTime  @default(now())
+  details         String?   // JSON string
+}
+
+model SyncHistory {
+  id              Int       @id @default(autoincrement())
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+  status          String    // running, success, failed
+  recordsProcessed Int      @default(0)
+  error           String?
+}
