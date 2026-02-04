@@ -1,6 +1,27 @@
 import { prisma, querySendy } from './db';
 
 /**
+ * Intelligently categorize campaign based on title and subject
+ */
+function categorizeCampaign(title: string, subject: string): string {
+  const text = `${title} ${subject}`.toLowerCase();
+  
+  // Check for course-related keywords
+  const courseKeywords = ['course', 'training', 'learn', 'tutorial', 'lesson', 'class', 'certification', 'program'];
+  if (courseKeywords.some(keyword => text.includes(keyword))) {
+    return 'courses';
+  }
+  
+  // Check for workshop-related keywords
+  const workshopKeywords = ['workshop', 'seminar', 'webinar', 'session', 'event', 'meetup', 'conference'];
+  if (workshopKeywords.some(keyword => text.includes(keyword))) {
+    return 'workshops';
+  }
+  
+  return 'general';
+}
+
+/**
  * Syncs data from remote Sendy MySQL to local SQLite
  */
 export async function syncData() {
@@ -13,6 +34,7 @@ export async function syncData() {
 
     // 1. Sync Campaigns
     console.log('Syncing campaigns...');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const campaigns = await querySendy<any[]>(`
       SELECT id, title, subject, from_name, from_email, sent, recipients, opens 
       FROM campaigns 
@@ -20,24 +42,32 @@ export async function syncData() {
     `);
 
     for (const c of campaigns) {
+      // Auto-categorize campaign
+      const category = categorizeCampaign(c.title || '', c.subject || '');
+      
       await prisma.campaign.upsert({
         where: { id: c.id.toString() },
         update: {
           title: c.title,
           subject: c.subject,
+          fromName: c.from_name || '',
+          fromEmail: c.from_email || '',
           status: c.sent ? 'sent' : 'draft',
           sentAt: c.sent ? new Date(parseInt(c.sent) * 1000) : null,
           recipients: parseInt(c.recipients) || 0,
           // Opens is tricky as it varies by Sendy version, treating as string count for now
           opened: typeof c.opens === 'string' ? (c.opens.split(',').length || 0) : (parseInt(c.opens) || 0),
           lastSyncedAt: new Date(),
+          // Only update category if not manually set (preserve existing if already set)
         },
         create: {
           id: c.id.toString(),
           title: c.title,
           subject: c.subject,
-          fromName: c.from_name,
-          fromEmail: c.from_email,
+          fromName: c.from_name || '',
+          fromEmail: c.from_email || '',
+          category: category,
+          senderName: c.from_name || null,
           status: c.sent ? 'sent' : 'draft',
           sentAt: c.sent ? new Date(parseInt(c.sent) * 1000) : null,
           recipients: parseInt(c.recipients) || 0,
@@ -50,6 +80,7 @@ export async function syncData() {
     console.log('Syncing subscribers...');
     // Note: 'subscribers' table can be huge. In production, use cursor-based pagination.
     // Here we fetch recent 500 for demo.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const subscribers = await querySendy<any[]>(`
       SELECT id, email, name, list, unsubscribed, bounced, timestamp 
       FROM subscribers 
@@ -93,7 +124,7 @@ export async function syncData() {
     console.log('Sync completed successfully.');
     return { success: true, records: campaigns.length + subscribers.length };
 
-  } catch (error: any) {
+  } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     console.error('Sync failed:', error);
     await prisma.syncHistory.update({
       where: { id: history.id },

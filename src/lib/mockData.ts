@@ -134,7 +134,7 @@ export const initializeMockData = () => {
   }));
 
   // Generate TimeSeries
-  const timeSeriesData: TimeSeriesData[] = Array.from({ length: 7 }).map((_, i) => ({
+  const timeSeriesData: TimeSeriesData[] = Array.from({ length: 7 }).map(() => ({
       date: faker.date.recent({ days: 7 }).toISOString().split('T')[0],
       sent: faker.number.int({ min: 1000, max: 5000 }),
       delivered: faker.number.int({ min: 900, max: 4800 }),

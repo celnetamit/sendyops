@@ -9,7 +9,7 @@ interface LogEntry {
   type: 'login' | 'logout' | 'mail_sent' | 'error';
   message: string;
   timestamp: string;
-  details?: any;
+  details?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export default function LogsPage() {

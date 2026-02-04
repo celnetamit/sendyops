@@ -1,11 +1,18 @@
 // Types for the Sendy Email Tracking Dashboard
 
 export type CampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'cancelled'
+export type CampaignCategory = 'courses' | 'workshops' | 'general'
 export type EmailEventType = 'sent' | 'delivered' | 'opened' | 'clicked' | 'bounced' | 'unsubscribed' | 'complained' | 'failed'
 export type BounceType = 'hard' | 'soft' | 'complaint'
 export type SubscriberStatus = 'subscribed' | 'unsubscribed' | 'bounced' | 'complained'
 export type UserRole = 'super_admin' | 'admin' | 'manager' | 'viewer'
 export type AlertSeverity = 'info' | 'warning' | 'error' | 'critical'
+
+export interface SenderInfo {
+  name?: string
+  department?: string
+  email: string
+}
 
 export interface Campaign {
   id: string
@@ -16,6 +23,14 @@ export interface Campaign {
   listName: string
   fromName: string
   fromEmail: string
+  
+  // Enhanced Tracking
+  category?: CampaignCategory
+  senderName?: string
+  senderDepartment?: string
+  topic?: string
+  targetAudience?: string
+  
   scheduledAt?: Date
   sentAt?: Date
   totalRecipients: number

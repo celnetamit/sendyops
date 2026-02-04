@@ -27,7 +27,7 @@ export const prisma = globalForPrisma.prisma || new PrismaClient({
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-export async function querySendy<T>(sql: string, params?: any[]): Promise<T> {
+export async function querySendy<T>(sql: string, params?: any[]): Promise<T> { // eslint-disable-line @typescript-eslint/no-explicit-any
   const [rows] = await sendyPool.execute(sql, params);
   return rows as T;
 }

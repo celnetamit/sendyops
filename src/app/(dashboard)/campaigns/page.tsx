@@ -1,29 +1,53 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Search, Download, Eye, Edit, Trash2, Activity } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { initializeMockData } from '@/lib/mockData'
-import { Campaign } from '@/types'
+
 import { formatNumber, formatPercentage } from '@/lib/utils'
 import { format } from 'date-fns'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { X, User, BarChart } from 'lucide-react'
 
-export default function CampaignsPage() {
+import { Suspense } from 'react'
+
+function CampaignsContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const senderParam = searchParams.get('sender')
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [campaigns, setCampaigns] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [senderStats, setSenderStats] = useState<any>(null)
 
   useEffect(() => {
     async function fetchCampaigns() {
       try {
-        const res = await fetch('/api/campaigns')
+        setLoading(true)
+        const queryParams = new URLSearchParams()
+        if (senderParam) queryParams.set('sender', senderParam)
+        
+        const res = await fetch(`/api/campaigns?${queryParams.toString()}`)
         const data = await res.json()
         setCampaigns(data)
+
+        if (senderParam) {
+           const statsRes = await fetch(`/api/stats/sender?sender=${senderParam}`)
+           const statsData = await statsRes.json()
+           setSenderStats(statsData)
+        } else {
+           setSenderStats(null)
+        }
+
       } catch (error) {
         console.error('Failed to fetch campaigns:', error)
       } finally {
@@ -31,14 +55,14 @@ export default function CampaignsPage() {
       }
     }
     fetchCampaigns()
-  }, [])
+  }, [senderParam])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-gray-600 font-medium">Loading campaigns...</p>
+          <p className="mt-4 text-gray-600 font-medium">Loading workshops...</p>
         </div>
       </div>
     )
@@ -49,9 +73,11 @@ export default function CampaignsPage() {
   // Filter campaigns
   const filteredCampaigns = campaigns.filter(campaign => {
     const matchesSearch = campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         campaign.subject.toLowerCase().includes(searchQuery.toLowerCase())
+                         campaign.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         (campaign.senderName && campaign.senderName.toLowerCase().includes(searchQuery.toLowerCase()))
     const matchesStatus = statusFilter === 'all' || campaign.status === statusFilter
-    return matchesSearch && matchesStatus
+    const matchesCategory = categoryFilter === 'all' || campaign.category === categoryFilter
+    return matchesSearch && matchesStatus && matchesCategory
   })
 
   const getStatusColor = (status: string) => {
@@ -64,29 +90,96 @@ export default function CampaignsPage() {
     }
   }
 
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'courses': return 'bg-blue-100 text-blue-700 border-blue-300'
+      case 'workshops': return 'bg-purple-100 text-purple-700 border-purple-300'
+      case 'general': return 'bg-gray-100 text-gray-700 border-gray-300'
+      default: return 'bg-gray-100 text-gray-700 border-gray-300'
+    }
+  }
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'courses': return '📚'
+      case 'workshops': return '🎯'
+      case 'general': return '📧'
+      default: return '📧'
+    }
+  }
+
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Campaigns
+            {senderParam ? `Workshops by ${senderStats?.name || senderParam}` : 'Workshops'}
           </h1>
           <p className="mt-1 text-sm text-gray-600">
-            Manage and monitor all your email campaigns
+            {senderParam ? 'Viewing specific user history and statistics' : 'Manage and monitor all your email workshops'}
           </p>
         </div>
-        <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
-          Create Campaign
-        </Button>
+        {!senderParam && (
+          <Link href="/campaigns/new">
+            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
+              Create Workshop
+            </Button>
+          </Link>
+        )}
+        {senderParam && (
+            <Button variant="outline" onClick={() => router.push('/campaigns')}>
+                <X className="h-4 w-4 mr-2" />
+                Clear Filter
+            </Button>
+        )}
       </div>
+
+      {/* Sender Stats Card */}
+      {senderParam && senderStats && (
+        <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 border-blue-100">
+            <CardContent className="pt-6">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                        {senderParam.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-900">{senderParam}</h2>
+                        <p className="text-sm text-gray-500">Workshop Organizer</p>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white p-4 rounded-xl shadow-sm">
+                        <div className="flex items-center gap-2 text-gray-500 mb-1">
+                            <BarChart className="h-4 w-4" />
+                            <span className="text-xs font-medium uppercase tracking-wider">Total Workshops</span>
+                        </div>
+                        <p className="text-2xl font-bold text-gray-900">{formatNumber(senderStats.totalWorkshops)}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-xl shadow-sm">
+                        <div className="flex items-center gap-2 text-gray-500 mb-1">
+                            <User className="h-4 w-4" />
+                            <span className="text-xs font-medium uppercase tracking-wider">Total Mails Sent</span>
+                        </div>
+                        <p className="text-2xl font-bold text-blue-600">{formatNumber(senderStats.totalMails)}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-xl shadow-sm">
+                        <div className="flex items-center gap-2 text-gray-500 mb-1">
+                            <Activity className="h-4 w-4" />
+                            <span className="text-xs font-medium uppercase tracking-wider">Active Workshops</span>
+                        </div>
+                        <p className="text-2xl font-bold text-green-600">{senderStats.activeWorkshops}</p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+      )}
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-gray-200">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-gray-900">{campaigns.length}</div>
-            <p className="text-sm text-gray-600 mt-1">Total Campaigns</p>
+            <p className="text-sm text-gray-600 mt-1">Total Workshops</p>
           </CardContent>
         </Card>
         <Card className="border-gray-200">
@@ -122,13 +215,23 @@ export default function CampaignsPage() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
-                placeholder="Search campaigns by title or subject..."
+                placeholder="Search workshops by title or subject..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
             <div className="flex gap-2">
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Categories</option>
+                <option value="courses">📚 Courses</option>
+                <option value="workshops">🎯 Workshops</option>
+                <option value="general">📧 General</option>
+              </select>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -160,15 +263,40 @@ export default function CampaignsPage() {
                     <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                       {campaign.title}
                     </h3>
+                    <Badge className={`${getCategoryColor(campaign.category || 'general')} border`}>
+                      {getCategoryIcon(campaign.category || 'general')} {campaign.category || 'general'}
+                    </Badge>
                     <Badge className={`${getStatusColor(campaign.status)} border`}>
                       {campaign.status}
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600 mb-3">{campaign.subject}</p>
                   <div className="flex items-center gap-6 text-sm text-gray-500">
-                    <span>Brand: <span className="font-medium text-gray-700">{campaign.brandName}</span></span>
-                    <span>List: <span className="font-medium text-gray-700">{campaign.listName}</span></span>
-                    <span>Sent: <span className="font-medium text-gray-700">{campaign.sentAt ? format(new Date(campaign.sentAt), 'MMM d, yyyy HH:mm') : 'N/A'}</span></span>
+                    {campaign.senderName && (
+                      <span className="flex items-center gap-1">
+                        Scheduled By: 
+                        <button 
+                            onClick={() => router.push(`/campaigns?sender=${encodeURIComponent(campaign.senderName)}`)}
+                            className="font-medium text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+                        >
+                            {campaign.senderName}
+                        </button>
+                      </span>
+                    )}
+                    {campaign.senderDepartment && (
+                      <span>Department: <span className="font-medium text-gray-700">{campaign.senderDepartment}</span></span>
+                    )}
+                    {campaign.topic && (
+                      <span>Topic: <span className="font-medium text-gray-700">{campaign.topic}</span></span>
+                    )}
+                    <span>Time & Date: <span className="font-medium text-gray-700">{campaign.sentAt ? format(new Date(campaign.sentAt), 'MMM d, yyyy HH:mm') : 'N/A'}</span></span>
+                    
+                    {/* Scheduled Count Display */}
+                    {(campaign.status === 'scheduled' || campaign.status === 'draft') && (
+                        <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                           {campaign.recipients} {campaign.status === 'scheduled' ? 'Scheduled Recipients' : 'Est. Recipients'}
+                        </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -242,10 +370,25 @@ export default function CampaignsPage() {
       {filteredCampaigns.length === 0 && (
         <Card className="border-gray-200">
           <CardContent className="py-12 text-center">
-            <p className="text-gray-500">No campaigns found matching your criteria.</p>
+            <p className="text-gray-500">No workshops found matching your criteria.</p>
           </CardContent>
         </Card>
       )}
     </div>
+  )
+}
+
+export default function CampaignsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+          <p className="mt-4 text-gray-600 font-medium">Loading workshops...</p>
+        </div>
+      </div>
+    }>
+      <CampaignsContent />
+    </Suspense>
   )
 }

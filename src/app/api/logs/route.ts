@@ -8,7 +8,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
 
-    let where: any = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: any = {};
     if (type && type !== 'all') {
       if (type === 'mail') {
         where.type = 'mail_sent';

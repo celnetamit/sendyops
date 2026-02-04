@@ -1,16 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Filter, Download, Mail, MousePointerClick, AlertCircle, CheckCircle } from 'lucide-react'
+import { Search, Download, Mail, MousePointerClick, AlertCircle, CheckCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { initializeMockData } from '@/lib/mockData'
-import { EmailEvent, EmailEventType } from '@/types'
+import { EmailEventType } from '@/types'
 import { format } from 'date-fns'
 
 export default function EventLogsPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [events, setEvents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -187,6 +187,7 @@ export default function EventLogsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     <Badge className={`${getEventColor(event.type as any)} border text-xs`}>
                       {event.type}
                     </Badge>

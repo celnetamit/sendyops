@@ -6,12 +6,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { initializeMockData } from '@/lib/mockData'
-import { Subscriber } from '@/types'
+
 import { formatNumber } from '@/lib/utils'
 import { format } from 'date-fns'
 
 export default function SubscribersPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [subscribers, setSubscribers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -62,11 +62,7 @@ export default function SubscribersPage() {
     }
   }
 
-  const getEngagementColor = (score: number) => {
-    if (score >= 70) return 'text-green-600'
-    if (score >= 40) return 'text-yellow-600'
-    return 'text-red-600'
-  }
+
 
   const stats = {
     total: subscribers.length,

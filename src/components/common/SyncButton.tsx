@@ -17,7 +17,7 @@ export function SyncButton() {
       const res = await fetch('/api/sync', { method: 'POST' });
       if (!res.ok) throw new Error('Sync failed');
       
-      const data = await res.json();
+      await res.json();
       setStatus('success');
       router.refresh();
       

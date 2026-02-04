@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { querySendy } from '@/lib/db';
+
 
 export async function GET() {
   try {
@@ -16,12 +16,13 @@ export async function GET() {
     // We'll return mock data structure but populated with whatever real info we can get
     // This serves as a placeholder until schema is verified
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const activity: any[] = [
       // Placeholder data until we can verify 'links' or 'opens' table structure
     ];
 
     return NextResponse.json(activity);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch activity' }, { status: 500 });
   }
 }

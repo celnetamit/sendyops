@@ -20,12 +20,20 @@ model Campaign {
   id              String    @id
   title           String
   subject         String
-  fromName        String?
-  fromEmail       String?
-  status          String    @default("draft") // draft, scheduled, sending, sent
+  fromName        String    @default("")
+  fromEmail       String    @default("")
+  content         String?   @default("") // HTML content for templates
+  status          String    @default("draft") // draft, scheduled, sending, sent, template
   recipients      Int       @default(0)
   sentAt          DateTime?
   createdAt       DateTime  @default(now())
+  
+  // Campaign Categorization & Sender Tracking
+  category        String    @default("general") // courses, workshops, general
+  senderName      String?   // Name of person/team sending
+  senderDepartment String?  // Department responsible
+  topic           String?   // Detailed topic/description
+  targetAudience  String?   // Who this campaign targets
   
   // Analytics
   opened          Int       @default(0)

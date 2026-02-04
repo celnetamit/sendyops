@@ -1,16 +1,20 @@
 import { ReactNode } from 'react'
 import { 
   LayoutDashboard, 
-  Send, 
+ 
   Users, 
   Activity, 
   Settings, 
   BarChart3,
   Mail,
-  ChevronLeft,
+
   Bell,
   Search,
-  ClipboardList
+  ClipboardList,
+  Presentation,
+  ShieldAlert,
+  Layout,
+  ExternalLink
 } from 'lucide-react'
 import Link from 'next/link'
 import { SyncButton } from '@/components/common/SyncButton'
@@ -22,11 +26,13 @@ interface SidebarProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Campaigns', href: '/campaigns', icon: Send },
+  { name: 'Workshops', href: '/campaigns', icon: Presentation },
+  { name: 'Templates', href: '/templates', icon: Layout },
   { name: 'Subscribers', href: '/subscribers', icon: Users },
   { name: 'Event Logs', href: '/events', icon: Activity },
   { name: 'System Logs', href: '/logs', icon: ClipboardList },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Blacklist', href: '/blacklist', icon: ShieldAlert },
   { name: 'Settings', href: '/settings', icon: Settings },
 ]
 
@@ -63,6 +69,18 @@ export function AppLayout({ children }: SidebarProps) {
               <span>{item.name}</span>
             </Link>
           ))}
+          
+          <div className="pt-4 mt-4 border-t border-gray-100">
+            <a 
+                href="https://sendy.co/demo" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-teal-50 hover:text-green-700 transition-all duration-200 group"
+            >
+                <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-green-600 transition-colors" />
+                <span>Open Sendy App</span>
+            </a>
+          </div>
         </nav>
 
 

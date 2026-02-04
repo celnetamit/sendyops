@@ -7,14 +7,19 @@ import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
 import { AlertsPanel } from '@/components/dashboard/AlertsPanel'
 import { PerformanceChart } from '@/components/dashboard/PerformanceChart'
 import { CampaignList } from '@/components/campaigns/CampaignList'
-import { initializeMockData } from '@/lib/mockData'
+
 import { formatPercentage } from '@/lib/utils'
 
 export default function DashboardPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [stats, setStats] = useState<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [campaigns, setCampaigns] = useState<any[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [activity, setActivity] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [categoryStats, setCategoryStats] = useState<any>({ courses: 0, workshops: 0, general: 0 })
 
   useEffect(() => {
     async function fetchData() {
@@ -32,6 +37,15 @@ export default function DashboardPage() {
         setStats(statsData);
         setCampaigns(campaignsData);
         setActivity(activityData);
+        
+        // Calculate category statistics
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const catStats = campaignsData.reduce((acc: any, campaign: any) => {
+          const category = campaign.category || 'general';
+          acc[category] = (acc[category] || 0) + 1;
+          return acc;
+        }, { courses: 0, workshops: 0, general: 0 });
+        setCategoryStats(catStats);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       } finally {
@@ -118,6 +132,25 @@ export default function DashboardPage() {
           title="Total Bounced"
           value={stats.totalBounced}
           icon={<AlertCircle className="h-5 w-5" />}
+        />
+      </div>
+
+      {/* Campaign Categories */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard
+          title="📚 Course Campaigns"
+          value={categoryStats.courses}
+          icon={<Mail className="h-5 w-5" />}
+        />
+        <StatCard
+          title="🎯 Workshop Campaigns"
+          value={categoryStats.workshops}
+          icon={<Users className="h-5 w-5" />}
+        />
+        <StatCard
+          title="📧 General Campaigns"
+          value={categoryStats.general}
+          icon={<Send className="h-5 w-5" />}
         />
       </div>
 

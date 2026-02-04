@@ -5,7 +5,7 @@ export async function POST() {
   try {
     const result = await syncData();
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
