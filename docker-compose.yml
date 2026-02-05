@@ -15,6 +15,7 @@ services:
       - DB_PORT=${DB_PORT}
       - AUTH_SECRET=${AUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - DATABASE_URL=${DATABASE_URL}
     volumes:
       - ./prisma:/app/prisma
     restart: unless-stopped
