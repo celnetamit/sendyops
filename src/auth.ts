@@ -23,16 +23,22 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     Credentials({
       async authorize(credentials) {
         const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(5) })
+          .object({ password: z.string().min(1) })
           .safeParse(credentials);
 
         if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data;
-          const user = await getUser(email);
-          if (!user) return null;
+          const { password } = parsedCredentials.data;
+          const accessPassword = process.env.ACCESS_PASSWORD;
           
-          const passwordsMatch = await bcrypt.compare(password, user.password);
-          if (passwordsMatch) return user;
+          // Simple string comparison for the single access password
+          // Note: In a real app, you might want to hash this too, but for simple access, string compare is fine if the env var is secure.
+          if (accessPassword && password === accessPassword) {
+             return {
+                id: '1',
+                name: 'Admin',
+                email: 'admin@local',
+             };
+          }
         }
 
         console.log('Invalid credentials');

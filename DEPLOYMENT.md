@@ -83,6 +83,7 @@ Go to the **Environment Variables** tab and add the following (copy from your `.
 | ----------------------- | ---------------------------------------------------------------------------------- |
 | `DATABASE_URL`          | Connection string to your Postgres DB (e.g. `postgresql://user:pass@host:5432/db`) |
 | `AUTH_SECRET`           | Secure random string                                                               |
+| `ACCESS_PASSWORD`       | Password for accessing the dashboard (e.g. `password123`)                          |
 | `NEXTAUTH_URL`          | The full URL of your deployed app (e.g. `https://sendy.yourdomain.com`)            |
 | `DB_HOST`, `DB_USER`... | Connection details for your remote Sendy MySQL database                            |
 

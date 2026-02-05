@@ -19,7 +19,7 @@ export default function LoginPage() {
         <form action={dispatch} className="relative bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8 space-y-6">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg mb-4">
-              <Mail className="h-6 w-6 text-white" />
+              <Lock className="h-6 w-6 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tight">
               Sendy Track
@@ -30,22 +30,7 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-4">
-            <div>
-              <label className="text-xs font-medium text-slate-300 ml-1 mb-1.5 block">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                <input
-                  className="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl py-2.5 pl-10 pr-4 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                  id="email"
-                  type="email"
-                  name="email"
-                  placeholder="admin@company.com"
-                  required
-                />
-              </div>
-            </div>
+
             <div>
               <label className="text-xs font-medium text-slate-300 ml-1 mb-1.5 block">
                 Password
