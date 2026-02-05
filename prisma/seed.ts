@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { faker } from '@faker-js/faker'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -14,12 +15,14 @@ async function main() {
 
   console.log('Database cleaned.')
 
+  const hashedPassword = await bcrypt.hash('password123', 10)
+
   // 2. Create Admin User
   await prisma.user.create({
     data: {
       email: 'admin@sendy.com',
       name: 'Admin User',
-      password: 'hashed_password_here', // In real app use bcrypt
+      password: hashedPassword,
       role: 'admin'
     }
   })
