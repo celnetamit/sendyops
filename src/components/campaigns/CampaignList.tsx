@@ -29,10 +29,14 @@ export function CampaignList({ campaigns }: CampaignListProps) {
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>
   }
 
+  if (!Array.isArray(campaigns)) {
+    return <div className="text-center p-4 text-red-500">Unable to load campaigns</div>
+  }
+
   const filteredCampaigns = campaigns.filter(campaign =>
-    campaign.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    campaign.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    campaign.brandName.toLowerCase().includes(searchTerm.toLowerCase())
+    (campaign.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (campaign.subject?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (campaign.brandName?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   )
 
   const sortedCampaigns = [...filteredCampaigns].sort((a, b) => {

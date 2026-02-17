@@ -212,11 +212,13 @@ export default function SubscribersPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredSubscribers.slice(0, 50).map((subscriber) => (
-                <tr key={subscriber.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={subscriber.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => window.location.href = `/subscribers/${subscriber.id}`}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       {subscriber.name && (
-                        <div className="text-sm font-medium text-gray-900">{subscriber.name}</div>
+                        <div className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                          {subscriber.name}
+                        </div>
                       )}
                       <div className="text-sm text-gray-500">{subscriber.email}</div>
                     </div>

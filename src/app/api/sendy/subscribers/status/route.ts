@@ -32,6 +32,7 @@ export async function GET(request: Request) {
     const total = countResult[0]?.total || 0;
 
     // Get data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const subscribers = await querySendy<any[]>(dataSql, [limit, offset]);
 
     return NextResponse.json({

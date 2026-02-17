@@ -6,6 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
+interface Template {
+  id: string;
+  title: string;
+  subject: string;
+  content?: string;
+}
+
 function CreateCampaignContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,8 +37,8 @@ function CreateCampaignContent() {
   const loadTemplate = async (id: string) => {
     try {
       const res = await fetch('/api/templates');
-      const templates = await res.json();
-      const template = templates.find((t: any) => t.id === id);
+      const templates: Template[] = await res.json();
+      const template = templates.find((t) => t.id === id);
       if (template) {
         setFormData(prev => ({
           ...prev,

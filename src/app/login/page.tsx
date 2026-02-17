@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { authenticate } from '@/lib/actions';
-import { Mail, Lock, ArrowRight, Activity, Eye, EyeOff } from 'lucide-react';
+import { Lock, ArrowRight, Activity, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [errorMessage, dispatch] = useFormState(authenticate, undefined);
@@ -30,6 +30,21 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-4">
+            <div>
+              <label className="text-xs font-medium text-slate-300 ml-1 mb-1.5 block">
+                User ID
+              </label>
+              <div className="relative">
+                <input
+                  className="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl py-2.5 pl-4 pr-4 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  id="id"
+                  type="text"
+                  name="id"
+                  placeholder="Enter your ID"
+                  required
+                />
+              </div>
+            </div>
 
             <div>
               <label className="text-xs font-medium text-slate-300 ml-1 mb-1.5 block">

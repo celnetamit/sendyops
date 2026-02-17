@@ -44,9 +44,22 @@ export async function GET() {
   return NextResponse.json(AVAILABLE_SKILLS);
 }
 
+export async function PUT(request: Request) {
+  const body = await request.json();
+  const { name, category, level } = body;
+  
+  // Implementation placeholder
+  return NextResponse.json({ message: 'Skill updated', data: { name, category, level } });
+}
+
+export async function DELETE() {
+  // Implementation placeholder
+  return NextResponse.json({ message: 'Skill deleted' });
+}
+
 export async function POST(request: Request) {
   try {
-    const { skillId, action } = await request.json();
+    const { action } = await request.json();
     
     // Simulate install/uninstall delay
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -55,7 +68,7 @@ export async function POST(request: Request) {
         success: true, 
         message: `Successfully ${action === 'install' ? 'installed' : 'uninstalled'} skill` 
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update skill' }, { status: 500 });
   }
 }

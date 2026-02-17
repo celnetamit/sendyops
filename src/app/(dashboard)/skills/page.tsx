@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link2, BarChart3, Sparkles, Layout, CheckCircle2, PlusCircle, Loader2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+
 
 type Skill = {
   id: string;

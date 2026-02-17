@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TimeSeriesData } from '@/types'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { Button } from '@/components/ui/button'
+
 
 interface PerformanceChartProps {
   data: TimeSeriesData[]
@@ -53,10 +53,11 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => {
-                  const date = new Date(value)
+                  if (!value) return '';
+                  const date = new Date(value);
+                  if (isNaN(date.getTime())) return '';
                   return `${date.getMonth() + 1}/${date.getDate()}`
                 }}
-                dy={10}
               />
               <YAxis 
                 tick={{ fontSize: 11, fill: '#6b7280' }} 

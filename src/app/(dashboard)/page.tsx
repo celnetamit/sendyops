@@ -9,17 +9,25 @@ import { PerformanceChart } from '@/components/dashboard/PerformanceChart'
 import { CampaignList } from '@/components/campaigns/CampaignList'
 
 import { formatPercentage } from '@/lib/utils'
+import { DashboardStats, Campaign, RecentActivity, TimeSeriesData } from '@/types'
+
+interface PageDashboardStats extends DashboardStats {
+  timeSeriesData: TimeSeriesData[];
+}
+
+interface CategoryStats {
+  courses: number;
+  workshops: number;
+  general: number;
+  [key: string]: number;
+}
 
 export default function DashboardPage() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [stats, setStats] = useState<any>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [campaigns, setCampaigns] = useState<any[]>([])
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [activity, setActivity] = useState<any[]>([])
+  const [stats, setStats] = useState<PageDashboardStats | null>(null)
+  const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [activity, setActivity] = useState<RecentActivity[]>([])
   const [loading, setLoading] = useState(true)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [categoryStats, setCategoryStats] = useState<any>({ courses: 0, workshops: 0, general: 0 })
+  const [categoryStats, setCategoryStats] = useState<CategoryStats>({ courses: 0, workshops: 0, general: 0 })
 
   useEffect(() => {
     async function fetchData() {
@@ -34,15 +42,21 @@ export default function DashboardPage() {
         const campaignsData = await campaignsRes.json();
         const activityData = await activityRes.json();
 
+
+
         setStats(statsData);
-        setCampaigns(campaignsData);
-        setActivity(activityData);
+        setCampaigns(Array.isArray(campaignsData) ? campaignsData : []);
+        setActivity(Array.isArray(activityData) ? activityData : []);
         
         // Calculate category statistics
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const catStats = campaignsData.reduce((acc: any, campaign: any) => {
-          const category = campaign.category || 'general';
-          acc[category] = (acc[category] || 0) + 1;
+        const safeCampaigns = Array.isArray(campaignsData) ? campaignsData : [];
+        const catStats = safeCampaigns.reduce((acc: CategoryStats, campaign: Campaign) => {
+          const category = (campaign.category || 'general') as keyof CategoryStats;
+          if (category in acc) {
+             acc[category] = (acc[category] || 0) + 1;
+          } else {
+             acc['general'] = (acc['general'] || 0) + 1;
+          }
           return acc;
         }, { courses: 0, workshops: 0, general: 0 });
         setCategoryStats(catStats);

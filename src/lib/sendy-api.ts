@@ -113,7 +113,7 @@ export class SendyAPI {
   async getLists(params: {
     brand_id: string;
     include_hidden?: boolean;
-  }): Promise<any> {
+  }): Promise<unknown> {
     const response = await this.request('/api/lists/get-lists.php', {
       ...params,
       include_hidden: params.include_hidden ? 'yes' : 'no'
@@ -125,7 +125,7 @@ export class SendyAPI {
     }
   }
 
-  async getBrands(): Promise<any> {
+  async getBrands(): Promise<unknown> {
     const response = await this.request('/api/brands/get-brands.php', {});
     try {
       return JSON.parse(response);

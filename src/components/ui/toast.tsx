@@ -11,7 +11,7 @@ export type ToastProps = {
     open?: boolean
 }
 
-export function Toast({ id, title, description, variant, onOpenChange }: ToastProps) {
+export function Toast({ title, description, variant, onOpenChange }: ToastProps) {
     return (
         <div className={`fixed bottom-4 right-4 z-[100] flex w-full max-w-md flex-col gap-1 overflow-hidden rounded-lg border bg-white p-6 shadow-lg transition-all ${
             variant === 'destructive' ? 'border-red-600 bg-red-50 text-red-900' : 'border-gray-200'
